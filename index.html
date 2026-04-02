@@ -3,21 +3,733 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reputation Software - Dark Chess Pro</title>
+  <title>暗棋宗師 — Dark Chess Pro | 頂尖 AI 暗棋</title>
+  <meta name="description" content="暗棋宗師：頂尖 AI 暗棋引擎，五級難度、變體規則、覆盤分析。免費下載，支援 iOS 與 Android。">
+  <meta name="keywords" content="暗棋,暗棋宗師,Dark Chess,Banqi,AI,棋類遊戲,board game">
+  <meta property="og:title" content="暗棋宗師 — Dark Chess Pro">
+  <meta property="og:description" content="挑戰頂尖級暗棋 AI，支援多種變體規則、覆盤分析與完整對弈體驗。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://apps.reputation-software.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Sans+SC:wght@400;500;700;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body { font-family: -apple-system, system-ui, sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; color: #333; }
-    h1 { font-size: 1.4rem; }
-    a { color: #0066cc; }
+    /* ===== Reset & Base ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Noto Sans TC', 'Noto Sans SC', 'Inter', -apple-system, system-ui, sans-serif;
+      background: #0d0d0f;
+      color: #e8e4df;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ===== Color Tokens ===== */
+    :root {
+      --brand: #E63946;
+      --brand-dark: #b82d38;
+      --brand-glow: rgba(230, 57, 70, 0.25);
+      --bg-primary: #0d0d0f;
+      --bg-card: #1a1a1e;
+      --bg-card-hover: #222226;
+      --text-primary: #e8e4df;
+      --text-secondary: #9a958e;
+      --text-muted: #6b665f;
+      --gold: #f6bf4f;
+      --border: rgba(255,255,255,0.06);
+    }
+
+    /* ===== Language Switcher ===== */
+    .lang-switcher {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      display: flex;
+      gap: 4px;
+      background: rgba(26,26,30,0.9);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 4px;
+    }
+    .lang-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 13px;
+      padding: 6px 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .lang-btn:hover { color: var(--text-primary); }
+    .lang-btn.active {
+      background: var(--brand);
+      color: #fff;
+    }
+
+    /* ===== Hero Section ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 24px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, var(--brand-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-content {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+    }
+    .hero-icon {
+      width: 160px;
+      height: 160px;
+      border-radius: 36px;
+      margin: 0 auto 32px;
+      filter: drop-shadow(0 20px 60px rgba(230,57,70,0.3));
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    .hero-title {
+      font-size: clamp(2.4rem, 6vw, 3.8rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+    .hero-title .brand-accent { color: var(--brand); }
+    .hero-subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+    .hero-hook {
+      font-size: clamp(1.1rem, 2.8vw, 1.4rem);
+      color: var(--gold);
+      font-weight: 700;
+      margin-bottom: 40px;
+    }
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .store-badge {
+      height: 54px;
+      transition: transform 0.2s, filter 0.2s;
+      filter: brightness(1);
+    }
+    .store-badge:hover {
+      transform: scale(1.05);
+      filter: brightness(1.1);
+    }
+
+    /* ===== Section Common ===== */
+    section { padding: 80px 24px; }
+    .section-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .section-label {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--brand);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .section-title {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 48px;
+      letter-spacing: -0.01em;
+    }
+
+    /* ===== Features ===== */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 24px;
+      transition: background 0.25s, transform 0.25s, border-color 0.25s;
+    }
+    .feature-card:hover {
+      background: var(--bg-card-hover);
+      transform: translateY(-4px);
+      border-color: rgba(230,57,70,0.2);
+    }
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 22px;
+    }
+    .feature-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .feature-card p {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* ===== Screenshots ===== */
+    .screenshots-section {
+      background: linear-gradient(180deg, var(--bg-primary) 0%, #111114 50%, var(--bg-primary) 100%);
+      overflow: hidden;
+    }
+    .screenshots-track {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 24px 24px;
+      scrollbar-width: none;
+    }
+    .screenshots-track::-webkit-scrollbar { display: none; }
+    .screenshot-item {
+      flex: 0 0 auto;
+      scroll-snap-align: center;
+      width: 260px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      border: 2px solid rgba(255,255,255,0.06);
+      transition: transform 0.3s;
+    }
+    .screenshot-item:hover { transform: scale(1.03); }
+    .screenshot-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .screenshot-caption {
+      text-align: center;
+      padding: 10px 8px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      background: var(--bg-card);
+    }
+
+    /* ===== Game Description ===== */
+    .about-section { background: #111114; }
+    .about-content {
+      max-width: 720px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .about-content p {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      line-height: 1.75;
+      margin-bottom: 16px;
+    }
+    .about-content .highlight {
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    /* ===== Download CTA ===== */
+    .cta-section {
+      text-align: center;
+      padding: 80px 24px 60px;
+      position: relative;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 400px;
+      background: radial-gradient(circle, var(--brand-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-title {
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .cta-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      margin-bottom: 36px;
+    }
+    .cta-badges {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+    }
+    footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    footer a:hover { color: var(--brand); }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .footer-links a { font-size: 0.9rem; }
+    .footer-copy {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* ===== Badge SVGs ===== */
+    .badge-link { display: inline-block; }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 640px) {
+      .hero { min-height: auto; padding: 120px 20px 60px; }
+      .hero-icon { width: 120px; height: 120px; border-radius: 28px; }
+      .features-grid { grid-template-columns: 1fr; gap: 16px; }
+      .screenshot-item { width: 200px; }
+      section { padding: 60px 20px; }
+      .store-badge { height: 46px; }
+      .lang-switcher { top: 12px; right: 12px; }
+      .lang-btn { font-size: 12px; padding: 5px 9px; }
+    }
+
+    /* ===== i18n visibility ===== */
+    [data-lang] { display: none; }
+    [data-lang].visible { display: initial; }
+    h1[data-lang].visible,
+    h2[data-lang].visible,
+    h3[data-lang].visible,
+    p[data-lang].visible,
+    span[data-lang].visible { display: initial; }
+    div[data-lang].visible { display: block; }
+    .screenshots-track[data-lang].visible { display: flex; }
   </style>
 </head>
 <body>
-  <h1>Dark Chess Pro / 暗棋宗師</h1>
-  <p>Dark Chinese Chess AI Engine by Reputation Software CO., LTD.</p>
-  <ul>
-    <li><a href="https://apps.apple.com/app/id6761172000">App Store</a></li>
-    <li><a href="https://play.google.com/store/apps/details?id=com.reputationsoftware.darkchessmaster">Google Play</a></li>
-  </ul>
-  <p><a href="https://sites.google.com/view/darkchesspro/%E9%9A%B1%E7%A7%81%E6%AC%8A%E6%94%BF%E7%AD%96">Privacy Policy</a></p>
-  <p>&copy; 2026 Reputation Software CO., LTD.</p>
+
+<!-- Language Switcher -->
+<div class="lang-switcher">
+  <button class="lang-btn active" onclick="setLang('zh-Hant')">繁</button>
+  <button class="lang-btn" onclick="setLang('zh-Hans')">简</button>
+  <button class="lang-btn" onclick="setLang('en')">EN</button>
+</div>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-content">
+    <!-- App Icon (inline SVG brandmark) -->
+    <svg class="hero-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#161312"/>
+          <stop offset="55%" stop-color="#1e1717"/>
+          <stop offset="100%" stop-color="#241615"/>
+        </linearGradient>
+        <radialGradient id="glow" cx="50%" cy="42%" r="52%">
+          <stop offset="0%" stop-color="#a53d3e" stop-opacity="0.42"/>
+          <stop offset="50%" stop-color="#6f242e" stop-opacity="0.18"/>
+          <stop offset="100%" stop-color="#161312" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="discRed" x1="0.2" y1="0.15" x2="0.8" y2="0.9">
+          <stop offset="0%" stop-color="#ff7066"/>
+          <stop offset="45%" stop-color="#f03c48"/>
+          <stop offset="100%" stop-color="#a9152e"/>
+        </linearGradient>
+        <linearGradient id="discIvory" x1="0.2" y1="0.15" x2="0.8" y2="0.9">
+          <stop offset="0%" stop-color="#fffaf2"/>
+          <stop offset="50%" stop-color="#f7e8d3"/>
+          <stop offset="100%" stop-color="#dfc8aa"/>
+        </linearGradient>
+        <linearGradient id="gold-g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#ffe39a"/>
+          <stop offset="50%" stop-color="#f6bf4f"/>
+          <stop offset="100%" stop-color="#c78521"/>
+        </linearGradient>
+        <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="28" stdDeviation="28" flood-color="#090607" flood-opacity="0.42"/>
+        </filter>
+        <pattern id="board" width="128" height="128" patternUnits="userSpaceOnUse">
+          <path d="M0 0H128M0 32H128M0 64H128M0 96H128M0 128H128" stroke="#7b2d31" stroke-opacity="0.18" stroke-width="2"/>
+          <path d="M0 0V128M32 0V128M64 0V128M96 0V128M128 0V128" stroke="#7b2d31" stroke-opacity="0.18" stroke-width="2"/>
+        </pattern>
+      </defs>
+      <rect width="1024" height="1024" rx="224" fill="url(#bg)"/>
+      <rect width="1024" height="1024" rx="224" fill="url(#board)"/>
+      <circle cx="512" cy="474" r="360" fill="url(#glow)"/>
+      <circle cx="520" cy="512" r="318" fill="none" stroke="#7f2e34" stroke-opacity="0.48" stroke-width="6"/>
+      <circle cx="520" cy="512" r="228" fill="none" stroke="#7f2e34" stroke-opacity="0.34" stroke-width="5"/>
+      <g filter="url(#softShadow)">
+        <circle cx="410" cy="592" r="222" fill="url(#discRed)" stroke="url(#gold-g)" stroke-width="22"/>
+        <circle cx="410" cy="592" r="178" fill="none" stroke="#f6bf4f" stroke-opacity="0.65" stroke-width="5"/>
+        <path d="M322 546c16-38 55-67 99-76 58-13 117 7 154 50" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="22" stroke-linecap="round"/>
+        <circle cx="350" cy="522" r="16" fill="#fff7e9" fill-opacity="0.9"/>
+        <circle cx="410" cy="500" r="16" fill="#fff7e9" fill-opacity="0.72"/>
+        <circle cx="470" cy="522" r="16" fill="#fff7e9" fill-opacity="0.54"/>
+      </g>
+      <g filter="url(#softShadow)">
+        <circle cx="634" cy="394" r="204" fill="url(#discIvory)" stroke="#7f2e34" stroke-width="18"/>
+        <circle cx="634" cy="394" r="164" fill="none" stroke="#d8b68f" stroke-opacity="0.7" stroke-width="4"/>
+        <ellipse cx="560" cy="304" rx="88" ry="48" fill="#ffffff" fill-opacity="0.4"/>
+        <g fill="#932533">
+          <rect x="546" y="276" width="176" height="26" rx="13"/>
+          <rect x="564" y="316" width="34" height="148" rx="16"/>
+          <rect x="670" y="316" width="34" height="148" rx="16"/>
+          <rect x="564" y="374" width="140" height="30" rx="15"/>
+          <rect x="600" y="424" width="68" height="36" rx="12"/>
+          <rect x="554" y="500" width="158" height="30" rx="15"/>
+        </g>
+      </g>
+      <g transform="translate(514 478)">
+        <path d="M0-54l12 30 32 6-24 21 7 33-27-18-27 18 7-33-24-21 32-6 12-30z" fill="url(#gold-g)"/>
+        <circle r="12" fill="#fff6d5"/>
+      </g>
+    </svg>
+
+    <h1 class="hero-title">
+      <span data-lang="zh-Hant" class="visible"><span class="brand-accent">暗棋</span>宗師</span>
+      <span data-lang="zh-Hans"><span class="brand-accent">暗棋</span>宗师</span>
+      <span data-lang="en"><span class="brand-accent">Dark</span> Chess Pro</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      <span data-lang="zh-Hant" class="visible">Dark Chess Pro</span>
+      <span data-lang="zh-Hans">Dark Chess Pro</span>
+      <span data-lang="en">Top-Tier Banqi AI & Variants</span>
+    </p>
+
+    <p class="hero-hook">
+      <span data-lang="zh-Hant" class="visible">挑戰真正有壓力的 AI 對手</span>
+      <span data-lang="zh-Hans">挑战真正有压力的 AI 对手</span>
+      <span data-lang="en">Challenge an AI that fights back.</span>
+    </p>
+
+    <div class="hero-cta">
+      <a class="badge-link" href="https://apps.apple.com/app/id6761172000" target="_blank" rel="noopener">
+        <img class="store-badge" src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store">
+      </a>
+      <a class="badge-link" href="https://play.google.com/store/apps/details?id=com.reputationsoftware.darkchessmaster" target="_blank" rel="noopener">
+        <img class="store-badge" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play">
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section class="features-section">
+  <div class="section-inner">
+    <div class="section-label">
+      <span data-lang="zh-Hant" class="visible">核心特色</span>
+      <span data-lang="zh-Hans">核心特色</span>
+      <span data-lang="en">FEATURES</span>
+    </div>
+    <h2 class="section-title">
+      <span data-lang="zh-Hant" class="visible">不只是暗棋，是完整的對弈體驗</span>
+      <span data-lang="zh-Hans">不只是暗棋，是完整的对弈体验</span>
+      <span data-lang="en">More than Banqi &mdash; a complete experience</span>
+    </h2>
+    <div class="features-grid">
+
+      <!-- Feature 1: AI -->
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 1 4 4c0 1.1-.45 2.1-1.17 2.83L12 12l-2.83-3.17A4 4 0 0 1 12 2Zm-6 10h12v2H6v-2Zm2 4h8v2H8v-2Zm2 4h4v2h-4v-2Z" fill="#fff"/></svg>
+        </div>
+        <h3>
+          <span data-lang="zh-Hant" class="visible">五級 AI 對手</span>
+          <span data-lang="zh-Hans">五级 AI 对手</span>
+          <span data-lang="en">5-Level AI</span>
+        </h3>
+        <p>
+          <span data-lang="zh-Hant" class="visible">從學徒到宗師，高階 AI 採用深度搜尋與穩定戰術決策，給你真正的挑戰。</span>
+          <span data-lang="zh-Hans">从学徒到宗师，高阶 AI 采用深度搜索与稳定战术决策，给你真正的挑战。</span>
+          <span data-lang="en">From Apprentice to Grandmaster. Higher levels use deeper search with steadier tactical decisions.</span>
+        </p>
+      </div>
+
+      <!-- Feature 2: Variants -->
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M19.14 12.94a7 7 0 0 0 .26-1.94c0-3.87-3.13-7-7-7A6.99 6.99 0 0 0 5.6 8.14 5 5 0 0 0 6 18h12.5a3.5 3.5 0 0 0 .64-6.94v-.06Z" fill="#fff"/></svg>
+        </div>
+        <h3>
+          <span data-lang="zh-Hant" class="visible">變體規則</span>
+          <span data-lang="zh-Hans">变体规则</span>
+          <span data-lang="en">Variant Rules</span>
+        </h3>
+        <p>
+          <span data-lang="zh-Hant" class="visible">車直衝、馬走斜線、炮飛山開關 — 自由組合，玩出你的暗棋節奏。</span>
+          <span data-lang="zh-Hans">车直冲、马走斜线、炮飞山开关 — 自由组合，玩出你的暗棋节奏。</span>
+          <span data-lang="en">Chariot Charge, Diagonal Knight, Cannon Jump toggle &mdash; mix rules to your style.</span>
+        </p>
+      </div>
+
+      <!-- Feature 3: Review -->
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <h3>
+          <span data-lang="zh-Hant" class="visible">搜尋統計與覆盤</span>
+          <span data-lang="zh-Hans">搜索统计与复盘</span>
+          <span data-lang="en">Search Stats & Review</span>
+        </h3>
+        <p>
+          <span data-lang="zh-Hant" class="visible">查看 AI 搜尋深度、節點數與思考過程，一步步覆盤精進棋力。</span>
+          <span data-lang="zh-Hans">查看 AI 搜索深度、节点数与思考过程，一步步复盘精进棋力。</span>
+          <span data-lang="en">View AI search depth, nodes, and thinking process. Replay every game move by move.</span>
+        </p>
+      </div>
+
+      <!-- Feature 4: Cross-platform -->
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" stroke="#fff" stroke-width="2"/><circle cx="12" cy="18" r="1" fill="#fff"/></svg>
+        </div>
+        <h3>
+          <span data-lang="zh-Hant" class="visible">手機與平板</span>
+          <span data-lang="zh-Hans">手机与平板</span>
+          <span data-lang="en">Phone & Tablet</span>
+        </h3>
+        <p>
+          <span data-lang="zh-Hant" class="visible">iOS 與 Android 雙平台，平板寬螢幕版面更舒展，無需帳號即可遊玩。</span>
+          <span data-lang="zh-Hans">iOS 与 Android 双平台，平板宽屏幕版面更舒展，无需账号即可游玩。</span>
+          <span data-lang="en">iOS & Android. Tablet-optimized layout with roomier boards. No account needed.</span>
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== SCREENSHOTS ===== -->
+<section class="screenshots-section">
+  <div class="section-inner">
+    <div class="section-label">
+      <span data-lang="zh-Hant" class="visible">遊戲畫面</span>
+      <span data-lang="zh-Hans">游戏画面</span>
+      <span data-lang="en">SCREENSHOTS</span>
+    </div>
+    <h2 class="section-title">
+      <span data-lang="zh-Hant" class="visible">流暢的暗棋體驗</span>
+      <span data-lang="zh-Hans">流畅的暗棋体验</span>
+      <span data-lang="en">A polished Dark Chess experience</span>
+    </h2>
+
+    <!-- zh-Hant screenshots -->
+    <div class="screenshots-track" data-lang="zh-Hant">
+      <div class="screenshot-item">
+        <img src="screenshots/01_home_zh_hant.png" alt="首頁" loading="lazy">
+        <div class="screenshot-caption">首頁</div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/03_game_zh_hant.png" alt="對弈畫面" loading="lazy">
+        <div class="screenshot-caption">對弈</div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/02_settings_zh_hant.png" alt="遊戲設定" loading="lazy">
+        <div class="screenshot-caption">設定</div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/04_rules_zh_hant.png" alt="規則說明" loading="lazy">
+        <div class="screenshot-caption">規則</div>
+      </div>
+    </div>
+
+    <!-- zh-Hans screenshots -->
+    <div class="screenshots-track" data-lang="zh-Hans">
+      <div class="screenshot-item">
+        <img src="screenshots/01_home_zh_hans.png" alt="首页" loading="lazy">
+        <div class="screenshot-caption">首页</div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/03_game_zh_hans.png" alt="对弈画面" loading="lazy">
+        <div class="screenshot-caption">对弈</div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/02_settings_zh_hans.png" alt="游戏设定" loading="lazy">
+        <div class="screenshot-caption">设定</div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/04_rules_zh_hans.png" alt="规则说明" loading="lazy">
+        <div class="screenshot-caption">规则</div>
+      </div>
+    </div>
+
+    <!-- en screenshots -->
+    <div class="screenshots-track" data-lang="en">
+      <div class="screenshot-item">
+        <img src="screenshots/01_home_en.png" alt="Home" loading="lazy">
+        <div class="screenshot-caption">Home</div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/03_game_en.png" alt="Gameplay" loading="lazy">
+        <div class="screenshot-caption">Gameplay</div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/02_settings_en.png" alt="Settings" loading="lazy">
+        <div class="screenshot-caption">Settings</div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/04_rules_en.png" alt="Rules" loading="lazy">
+        <div class="screenshot-caption">Rules</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ABOUT ===== -->
+<section class="about-section">
+  <div class="section-inner about-content">
+    <div class="section-label">
+      <span data-lang="zh-Hant" class="visible">關於暗棋</span>
+      <span data-lang="zh-Hans">关于暗棋</span>
+      <span data-lang="en">ABOUT DARK CHESS</span>
+    </div>
+    <div data-lang="zh-Hant" class="visible">
+      <p>暗棋（半棋）是在 <span class="highlight">4×8 棋盤</span>上進行的中國棋類遊戲。32 顆棋子初始覆蓋，翻開後依照位階規則進行吃子。</p>
+      <p>策略、<span class="highlight">資訊不完全</span>與戰術爆發並存，每一盤都有截然不同的展開。暗棋宗師的 AI 引擎以 Expectiminimax 搜尋處理翻棋的隨機性，讓你面對的不是亂下的電腦，而是會算計、會施壓的真正對手。</p>
+    </div>
+    <div data-lang="zh-Hans">
+      <p>暗棋（半棋）是在 <span class="highlight">4×8 棋盘</span>上进行的中国棋类游戏。32 颗棋子初始覆盖，翻开后依照位阶规则进行吃子。</p>
+      <p>策略、<span class="highlight">信息不完全</span>与战术爆发并存，每一盘都有截然不同的展开。暗棋宗师的 AI 引擎以 Expectiminimax 搜索处理翻棋的随机性，让你面对的不是乱下的电脑，而是会算计、会施压的真正对手。</p>
+    </div>
+    <div data-lang="en">
+      <p>Dark Chess (Banqi / Half Chess) is a Chinese board game played on a <span class="highlight">4×8 grid</span>. All 32 pieces start face-down and are revealed during play.</p>
+      <p>Strategy, <span class="highlight">incomplete information</span>, and sharp tactical swings make every game different. The AI engine uses Expectiminimax search to handle reveal randomness &mdash; you'll face a real opponent that calculates and pressures, not random moves.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DOWNLOAD CTA ===== -->
+<section class="cta-section">
+  <h2 class="cta-title">
+    <span data-lang="zh-Hant" class="visible">準備好接受挑戰了嗎？</span>
+    <span data-lang="zh-Hans">准备好接受挑战了吗？</span>
+    <span data-lang="en">Ready to play?</span>
+  </h2>
+  <p class="cta-subtitle">
+    <span data-lang="zh-Hant" class="visible">免費下載，立即開局。一次買斷解鎖完整 Pro 功能。</span>
+    <span data-lang="zh-Hans">免费下载，立即开局。一次买断解锁完整 Pro 功能。</span>
+    <span data-lang="en">Free to download. One-time Pro Unlock for full features.</span>
+  </p>
+  <div class="cta-badges">
+    <a class="badge-link" href="https://apps.apple.com/app/id6761172000" target="_blank" rel="noopener">
+      <img class="store-badge" src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store">
+    </a>
+    <a class="badge-link" href="https://play.google.com/store/apps/details?id=com.reputationsoftware.darkchessmaster" target="_blank" rel="noopener">
+      <img class="store-badge" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play">
+    </a>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-links">
+    <a href="https://sites.google.com/view/darkchesspro/%E9%9A%B1%E7%A7%81%E6%AC%8A%E6%94%BF%E7%AD%96" target="_blank" rel="noopener">
+      <span data-lang="zh-Hant" class="visible">隱私權政策</span>
+      <span data-lang="zh-Hans">隐私权政策</span>
+      <span data-lang="en">Privacy Policy</span>
+    </a>
+    <a href="mailto:comeinchosen@gmail.com">
+      <span data-lang="zh-Hant" class="visible">聯絡我們</span>
+      <span data-lang="zh-Hans">联系我们</span>
+      <span data-lang="en">Contact</span>
+    </a>
+  </div>
+  <p class="footer-copy">&copy; 2026 Reputation Software CO., LTD. All rights reserved.</p>
+</footer>
+
+<script>
+  // ===== i18n Language Switcher =====
+  function setLang(lang) {
+    // Update buttons
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active',
+        (lang === 'zh-Hant' && btn.textContent === '繁') ||
+        (lang === 'zh-Hans' && btn.textContent === '简') ||
+        (lang === 'en' && btn.textContent === 'EN')
+      );
+    });
+    // Toggle visibility
+    document.querySelectorAll('[data-lang]').forEach(el => {
+      el.classList.toggle('visible', el.dataset.lang === lang);
+    });
+    // Update html lang
+    document.documentElement.lang = lang === 'zh-Hant' ? 'zh-Hant' : lang === 'zh-Hans' ? 'zh-Hans' : 'en';
+    // Persist
+    try { localStorage.setItem('darkchess-lang', lang); } catch(e) {}
+  }
+
+  // Auto-detect language on load
+  (function() {
+    var saved = null;
+    try { saved = localStorage.getItem('darkchess-lang'); } catch(e) {}
+    if (saved && ['zh-Hant','zh-Hans','en'].indexOf(saved) !== -1) {
+      setLang(saved);
+      return;
+    }
+    var nav = (navigator.language || navigator.userLanguage || '').toLowerCase();
+    if (nav.indexOf('zh-tw') !== -1 || nav.indexOf('zh-hant') !== -1) {
+      setLang('zh-Hant');
+    } else if (nav.indexOf('zh') !== -1) {
+      setLang('zh-Hans');
+    } else {
+      setLang('en');
+    }
+  })();
+</script>
+
 </body>
 </html>
